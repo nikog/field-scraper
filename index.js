@@ -10,7 +10,7 @@ let db = new Datastore({
 });
 
 let preferences = {
-  earliestTime: '16:00',
+  earliestTime: '18:00',
   latestTime: '20:00'
 };
 
