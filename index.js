@@ -5,6 +5,8 @@ import Datastore from 'nedb';
 import FieldScraper from './field-scraper';
 import Notifier from './notifier';
 
+console.log(moment().format('MMMM Do YYYY, HH:mm:ss') + '.', 'Checking for available courses.');
+
 let db = new Datastore({
   filename: 'database/fields.db'
 });
