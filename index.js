@@ -60,7 +60,7 @@ console.log('Times between:', preferences.earliestTime, '-', preferences.latestT
 while (daysToParse > 0) {
   let weekDay = date.isoWeekday();
 
-  if (weekDaysToParse.includes(weekDay + '')) {
+  if (weekDaysToParse.indexOf(weekDay + '') > -1) {
     let scraperDone = fieldScraper.scrape(date.format('YYYY-MM-DD'));
     scrapersDone.push(scraperDone);
 
