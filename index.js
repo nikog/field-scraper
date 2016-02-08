@@ -1,22 +1,46 @@
 'use strict';
 
 import moment from 'moment';
+import argv from 'yargs';
 import Datastore from 'nedb';
 import FieldScraper from './field-scraper';
 import Notifier from './notifier';
 
-console.log(moment().format('MMMM Do YYYY, HH:mm:ss') + '.', 'Checking for available courses.');
+let args = argv.argv;
+
+if (!args.startTime) {
+  console.log('No start time specified');
+  process.exit(1);
+}
+
+if (!args.endTime) {
+  console.log('No end time specified');
+  process.exit(1);
+}
+
+let weekDaysToParse = '1,2,3,4,5,6,7';
+
+if (args.weekDays) {
+  weekDaysToParse = args.weekDays + '';
+
+  if (!weekDaysToParse.match(/^(\d,)*(\d)$/)) {
+    console.log('Invalid format for days to parse')
+    process.exit(1);
+  }
+}
+
+weekDaysToParse = weekDaysToParse.split(',');
+
+let preferences = {
+  earliestTime: args.startTime,
+  latestTime: args.endTime
+};
 
 let db = new Datastore({
   filename: 'database/fields.db'
 });
 
-let preferences = {
-  earliestTime: '18:00',
-  latestTime: '20:00'
-};
-
-let daysToParse = 5;
+let daysToParse = args.days || weekDaysToParse.length || 5;
 let date = moment();
 let fieldScraper = new FieldScraper(preferences);
 let scrapersDone = [];
@@ -27,10 +51,16 @@ db.loadDatabase((err) => {
   }
 });
 
+console.log('----------');
+console.log(moment().format('MMMM Do YYYY, HH:mm:ss') + '.', 'Checking for available courses.');
+console.log('Days:', daysToParse);
+console.log('Days of week:', weekDaysToParse.join(', '));
+console.log('Times between:', preferences.earliestTime, '-', preferences.latestTime);
+
 while (daysToParse > 0) {
   let weekDay = date.isoWeekday();
 
-  if (weekDay < 5) {
+  if (weekDaysToParse.includes(weekDay + '')) {
     let scraperDone = fieldScraper.scrape(date.format('YYYY-MM-DD'));
     scrapersDone.push(scraperDone);
 
